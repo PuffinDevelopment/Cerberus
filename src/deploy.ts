@@ -21,7 +21,7 @@ try {
 		body,
 	});
 
-	logger.info(`Successfully reloaded interaction commands.`);
+	logger.info("Successfully reloaded interaction commands.");
 } catch (error_) {
 	const error = error_ as Error;
 	logger.error(error.message, error);
