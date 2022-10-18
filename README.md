@@ -1,5 +1,12 @@
-<div align="center">
-  <p>
-    <a href="https://discord.gg/DttJf7cdxB"><img src="https://img.shields.io/discord/222078108977594368?color=5865F2&logo=discord&logoColor=white" alt="Discord server" /></a>
-  </p>
-</div>
+# Cerberus
+
+> .
+
+I'll get into filling this out later, gotta stay tuned for now.
+
+## Author
+
+**Cerberus** © [Puffin](https://github.com/PuffinDevelopment).  
+Authored and maintained by Puffin.
+
+> GitHub [@Puffin](https://github.com/PuffinDevelopment)
