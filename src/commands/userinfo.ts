@@ -5,11 +5,11 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import utc from "dayjs/plugin/utc.js";
 import {
 	type TimestampStylesString,
-	type APIEmbed,
 	type GuildMember,
 	inlineCode,
 	italic,
 	type User,
+	type APIEmbed,
 	time,
 	TimestampStyles,
 	ApplicationFlagsBitField,
