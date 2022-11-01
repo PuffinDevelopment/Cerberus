@@ -23,6 +23,10 @@ export enum Colors {
 	DiscordDanger = 0xed4245,
 }
 
+export const MENTION_EXPIRE_SECONDS = 60;
+export const SCAM_THRESHOLD = 3;
+export const SCAM_EXPIRE_SECONDS = 5 * 60;
+
 export const DATE_FORMAT_LOGFILE = "YYYY-MM-DD_HH-mm-ss";
 export const DATE_FORMAT_WITH_SECONDS = "YYYY/MM/DD HH:mm:ss";
 
