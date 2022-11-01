@@ -155,16 +155,6 @@ export default class extends Command<typeof ClearCommand | typeof ClearContextCo
 			});
 
 			try {
-				// if (!process.env.GUILD_LOG_WEBHOOK_ID) {
-				// 	return;
-				// }
-
-				// const webhook = this.webhooks.get(process.env.GUILD_LOG_WEBHOOK_ID);
-
-				// if (!webhook) {
-				// 	return;
-				// }
-
 				const channel = interaction.guild.client.channels.resolve(process.env.GUILD_LOG_CHANNEL!) as TextChannel;
 
 				const descriptionParts = [
