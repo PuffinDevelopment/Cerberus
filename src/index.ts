@@ -12,10 +12,12 @@ import {
 import type { CommandPayload, Event } from "@yuudachi/framework/types";
 import { Client, GatewayIntentBits, Options, Partials } from "discord.js";
 import readdirp from "readdirp";
+import { createMongo } from "./util/mongo.js";
 import { createRedis } from "./util/redis.js";
 import { createWebhooks } from "./util/webhooks.js";
 
 await createRedis();
+await createMongo();
 
 const client = new Client({
 	intents: [
