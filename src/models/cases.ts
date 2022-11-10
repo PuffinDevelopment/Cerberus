@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import typegoose from "@typegoose/typegoose";
+import typegoose, { type ReturnModelType } from "@typegoose/typegoose";
 import { now } from "mongoose";
 
 const { modelOptions, getModelForClass, prop } = typegoose;
@@ -8,9 +8,6 @@ const { modelOptions, getModelForClass, prop } = typegoose;
 export class cases {
 	@prop({ required: true })
 	guild_id!: string;
-
-	@prop()
-	message!: string;
 
 	@prop({ required: true })
 	case_id!: number;
@@ -36,8 +33,11 @@ export class cases {
 	@prop()
 	reason!: string;
 
-	@prop()
-	action_duration!: Date;
+	@prop({ default: null })
+	context_message_id!: string;
+
+	@prop({ default: null })
+	action_expiration!: Date;
 
 	@prop({ default: true })
 	action_processed!: boolean;
@@ -45,8 +45,19 @@ export class cases {
 	@prop({ default: now(), required: true })
 	created_at!: Date;
 
-	@prop()
-	mute_message!: string;
+	@prop({ default: false })
+	multi!: boolean;
+
+	public static async nextCase(this: ReturnModelType<typeof cases>, guild_id: string) {
+		let id: number;
+		const next_id = await this.find({ guild_id }).exec();
+		if (!next_id) {
+			id = 1;
+		}
+
+		id = next_id.length + 1;
+		return id;
+	}
 }
 
 export default getModelForClass(cases);
