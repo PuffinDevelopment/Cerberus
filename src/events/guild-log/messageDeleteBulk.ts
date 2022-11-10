@@ -1,14 +1,15 @@
 import { Buffer } from "node:buffer";
 import { on } from "node:events";
-import process from "node:process";
 import { addFields, truncateEmbed } from "@yuudachi/framework";
 import type { Event } from "@yuudachi/framework/types";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import utc from "dayjs/plugin/utc.js";
-import { Client, Events, type Snowflake, type TextChannel } from "discord.js";
+import { Client, Events, type Snowflake } from "discord.js";
 import { injectable } from "tsyringe";
 import { formatMessagesToAttachment } from "../../functions/logging/formatMessagesToAttachment.js";
+import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
+import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
 import { Color } from "../../util/constants.js";
 
 dayjs.extend(relativeTime);
@@ -31,7 +32,14 @@ export default class implements Event {
 				continue;
 			}
 
-			const channel = firstMessage.guild.client.channels.resolve(process.env.GUILD_LOG_CHANNEL!) as TextChannel;
+			const channel = checkLogChannel(
+				firstMessage.guild,
+				await getGuildSetting(firstMessage.guild.id, SettingsKeys.GuildLogChannelId),
+			);
+
+			if (!channel) {
+				continue;
+			}
 
 			const uniqueAuthors = new Set<Snowflake>();
 			for (const message of userMessages.values()) {

@@ -1,7 +1,8 @@
-import { kRedis, container } from "@yuudachi/framework";
+import { container } from "@yuudachi/framework";
 import type { Snowflake } from "discord.js";
 import { FormattingPatterns } from "discord.js";
 import type { Redis } from "ioredis";
+import { kRedis } from "../../tokens.js";
 import { removeCodeBlocks } from "../../util/codeBlock.js";
 import { MENTION_EXPIRE_SECONDS } from "../../util/constants.js";
 

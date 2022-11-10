@@ -1,9 +1,10 @@
 import { on } from "node:events";
-import process from "node:process";
 import { logger, addFields, truncateEmbed } from "@yuudachi/framework";
 import type { Event } from "@yuudachi/framework/types";
-import { ChannelType, Client, Events, messageLink, MessageType, type Message, type TextChannel } from "discord.js";
+import { ChannelType, Client, Events, messageLink, type Message, MessageType } from "discord.js";
 import { injectable } from "tsyringe";
+import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
+import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
 import { Color } from "../../util/constants.js";
 
 @injectable()
@@ -28,7 +29,14 @@ export default class implements Event {
 				continue;
 			}
 
-			const channel = message.guild.client.channels.resolve(process.env.GUILD_LOG_CHANNEL!) as TextChannel;
+			const channel = checkLogChannel(
+				message.guild,
+				await getGuildSetting(message.guild.id, SettingsKeys.GuildLogChannelId),
+			);
+
+			if (!channel) {
+				continue;
+			}
 
 			logger.info(
 				{
