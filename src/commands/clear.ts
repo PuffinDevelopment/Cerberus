@@ -1,5 +1,3 @@
-/* eslint-disable n/prefer-global/process */
-/* eslint-disable no-restricted-globals */
 import { Buffer } from "node:buffer";
 import { ms } from "@naval-base/ms";
 import {
@@ -19,6 +17,8 @@ import { inject, injectable } from "tsyringe";
 import { formatMessageToEmbed } from "../functions/logging/formatMessageToEmbed.js";
 import { formatMessagesToAttachment } from "../functions/logging/formatMessagesToAttachment.js";
 import { fetchMessages, orderMessages, pruneMessages } from "../functions/pruning/pruneMessages.js";
+import { checkLogChannel } from "../functions/settings/checkLogChannel.js";
+import { getGuildSetting, SettingsKeys } from "../functions/settings/getGuildSetting.js";
 import type { ClearCommand, ClearContextCommand } from "../interactions/index.js";
 import { kWebhooks } from "../tokens.js";
 import { Color, DATE_FORMAT_LOGFILE } from "../util/constants.js";
@@ -155,7 +155,10 @@ export default class extends Command<typeof ClearCommand | typeof ClearContextCo
 			});
 
 			try {
-				const channel = interaction.guild.client.channels.resolve(process.env.GUILD_LOG_CHANNEL!) as TextChannel;
+				const channel = checkLogChannel(
+					interaction.guild,
+					await getGuildSetting(interaction.guild.id, SettingsKeys.GuildLogChannelId!),
+				) as unknown as TextChannel;
 
 				const descriptionParts = [
 					`• Messages: ${prunedMessages.size}`,
