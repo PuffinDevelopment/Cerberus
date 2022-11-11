@@ -23,6 +23,9 @@ export enum Colors {
 	DiscordDanger = 0xed4245,
 }
 
+export const CASE_REASON_MAX_LENGTH = 500;
+export const CASE_REASON_MIN_LENGTH = 3;
+
 export const MENTION_THRESHOLD = 10;
 export const MENTION_EXPIRE_SECONDS = 60;
 export const SCAM_THRESHOLD = 3;
