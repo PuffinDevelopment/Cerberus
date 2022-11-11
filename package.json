@@ -29,6 +29,7 @@
 		"dayjs": "^1.11.5",
 		"discord.js": "^14.5.0",
 		"env-cmd": "^10.1.0",
+		"fastest-levenshtein": "^1.0.16",
 		"ioredis": "^5.2.3",
 		"kleur": "^4.1.5",
 		"mongoose": "^6.7.0",
