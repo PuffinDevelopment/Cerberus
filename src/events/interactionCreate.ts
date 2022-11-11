@@ -1,7 +1,9 @@
-import { transformInteraction, kCommands, type CommandMap, logger } from "@yuudachi/framework";
-import type { Event } from "@yuudachi/framework/types";
-import { ApplicationCommandType, Events, Client } from "discord.js";
-import { injectable, inject } from "tsyringe";
+import type { Command } from "@yuudachi/framework";
+import { transformInteraction, logger, kCommands } from "@yuudachi/framework";
+import type { Event, CommandPayload } from "@yuudachi/framework/types";
+import { ApplicationCommandType, Client, Events } from "discord.js";
+import { inject, injectable } from "tsyringe";
+import { checkReasonAutocomplete, handleAutocompleteReasons } from "../functions/autocomplete/reasons.js";
 
 @injectable()
 export default class implements Event {
@@ -9,9 +11,12 @@ export default class implements Event {
 
 	public event = Events.InteractionCreate as const;
 
-	public constructor(public readonly client: Client<true>, @inject(kCommands) public readonly commands: CommandMap) {}
+	public constructor(
+		public readonly client: Client<true>,
+		@inject(kCommands) public readonly commands: Map<string, Command<CommandPayload>>,
+	) {}
 
-	public execute() {
+	public execute(): void {
 		this.client.on(this.event, async (interaction) => {
 			if (
 				!interaction.isCommand() &&
@@ -27,6 +32,7 @@ export default class implements Event {
 			}
 
 			const command = this.commands.get(interaction.commandName.toLowerCase());
+
 			if (command) {
 				try {
 					switch (interaction.commandType) {
@@ -39,10 +45,19 @@ export default class implements Event {
 							);
 
 							if (isAutocomplete) {
-								await command.autocomplete(interaction, transformInteraction(interaction.options.data), "");
+								if (checkReasonAutocomplete(interaction)) {
+									logger.info(
+										{ command: { name: interaction.commandName, type: interaction.type }, userId: interaction.user.id },
+										`Executing reason autocomplete for command ${interaction.commandName}`,
+									);
+									await handleAutocompleteReasons(interaction);
+									break;
+								}
+
+								await command.autocomplete(interaction, transformInteraction(interaction.options.data), "en-US");
 								break;
 							} else {
-								await command.chatInput(interaction, transformInteraction(interaction.options.data), "");
+								await command.chatInput(interaction, transformInteraction(interaction.options.data), "en-US");
 								break;
 							}
 						}
@@ -53,7 +68,7 @@ export default class implements Event {
 								`Executing message context command ${interaction.commandName}`,
 							);
 
-							await command.messageContext(interaction, transformInteraction(interaction.options.data), "");
+							await command.messageContext(interaction, transformInteraction(interaction.options.data), "en-US");
 							break;
 						}
 
@@ -63,7 +78,7 @@ export default class implements Event {
 								`Executing user context command ${interaction.commandName}`,
 							);
 
-							await command.userContext(interaction, transformInteraction(interaction.options.data), "");
+							await command.userContext(interaction, transformInteraction(interaction.options.data), "en-US");
 							break;
 						}
 
@@ -84,15 +99,19 @@ export default class implements Event {
 								{ command: { name: interaction.commandName, type: interaction.type }, userId: interaction.user.id },
 								"Command interaction has not been deferred before throwing",
 							);
-							await interaction.deferReply({
-								ephemeral: true,
-							});
+							await interaction.deferReply({ ephemeral: true });
 						}
 
-						await interaction.editReply({ content: error.message, components: [], allowedMentions: { parse: [] } });
-					} catch (error_) {
-						const error = error_ as Error;
-						logger.error(error, error.message);
+						await interaction.editReply({ content: error.message, components: [] });
+					} catch (error__) {
+						const subError = error__ as Error;
+						logger.error(subError, subError.message);
+
+						if (interaction.isAutocomplete()) {
+							return;
+						}
+
+						await interaction.followUp({ content: error.message, components: [], ephemeral: true });
 					}
 				}
 			}
