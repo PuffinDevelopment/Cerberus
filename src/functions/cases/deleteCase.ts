@@ -75,12 +75,7 @@ export async function deleteCase({
 				},
 				case_reference: case_?.case_id,
 			},
-			action:
-				case_action === CaseAction.Ban
-					? CaseAction.Unban
-					: case_action === CaseAction.Role
-					? CaseAction.Unrole
-					: CaseAction.TimeoutEnd,
+			action: case_action === CaseAction.Ban ? CaseAction.Unban : CaseAction.TimeoutEnd,
 		}),
 		skipAction,
 	);

@@ -7,8 +7,6 @@ import { cases } from "../../models/cases.js";
 import { type RawCase, transformCase } from "./transformCase.js";
 
 export enum CaseAction {
-	Role,
-	Unrole,
 	Warn,
 	Kick,
 	Softban,
@@ -48,16 +46,6 @@ export async function createCase(
 	try {
 		if (!skipAction) {
 			switch (case_.action) {
-				case CaseAction.Role: {
-					await case_.target!.roles.add(case_.roleId!, reason);
-					break;
-				}
-
-				case CaseAction.Unrole: {
-					await case_.target!.roles.remove(case_.roleId!, reason);
-					break;
-				}
-
 				case CaseAction.TimeoutEnd:
 				case CaseAction.Warn:
 					break;

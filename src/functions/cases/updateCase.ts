@@ -6,7 +6,7 @@ import { type RawCase, transformCase } from "./transformCase.js";
 
 export type PatchCase = Pick<
 	CreateCase,
-	"actionExpiration" | "caseId" | "contextMessageId" | "guildId" | "reason" | "refId" | "reportRefId"
+	"actionExpiration" | "caseId" | "contextMessageId" | "guildId" | "reason" | "refId"
 >;
 
 export async function updateCase(case_: PatchCase) {
@@ -21,7 +21,10 @@ export async function updateCase(case_: PatchCase) {
 
 	const queries = removeUndefinedKeys(updates);
 
-	const updatedCase = (await mongo.findOneAndUpdate({ guild_id: case_.guildId }, queries)) as RawCase;
+	const updatedCase = (await mongo.findOneAndUpdate(
+		{ guild_id: case_.guildId, case_id: case_.caseId },
+		queries,
+	)) as RawCase;
 
 	return transformCase(updatedCase);
 }

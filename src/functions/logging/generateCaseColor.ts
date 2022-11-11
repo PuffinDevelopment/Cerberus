@@ -2,7 +2,6 @@ import { type Case, CaseAction } from "../cases/createCase.js";
 
 export function generateCaseColor(case_: Case) {
 	switch (case_.action) {
-		case CaseAction.Role:
 		case CaseAction.Warn:
 		case CaseAction.Timeout:
 			return 16_767_836;

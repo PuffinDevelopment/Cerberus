@@ -12,8 +12,8 @@ export async function upsertCaseLog(guild: Guild, user: User | null | undefined,
 
 	const embed = await generateCaseEmbed(user, case_);
 
-	if (case_.logMessageId) {
-		const message = await modLogChannel!.messages.fetch(case_.logMessageId);
+	if (case_.contextMessageId) {
+		const message = await modLogChannel!.messages.fetch(case_.contextMessageId);
 		await message.edit({
 			embeds: [embed],
 		});
@@ -24,7 +24,7 @@ export async function upsertCaseLog(guild: Guild, user: User | null | undefined,
 
 		await mongo.findOneAndUpdate(
 			{ guild_id: case_.guildId, case_id: case_.caseId },
-			{ context_message_id: logMessage.url },
+			{ context_message_id: logMessage.id },
 		);
 	}
 }
