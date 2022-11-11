@@ -15,11 +15,11 @@ import {
 	ApplicationFlagsBitField,
 } from "discord.js";
 import kleur from "kleur";
-import type { UserInfoContextCommand } from "../interactions/context/userinfoContext.js";
-import type { UserInfoCommand } from "../interactions/slash/userinfo.js";
-import { EMOJI_NEWBIE, TAB, Colors } from "../util/constants.js";
-import { formatUserFlag, formatApplicationFlag } from "../util/formatting.js";
-import { truncateEmbed } from "../util/index.js";
+import type { UserInfoContextCommand } from "../../interactions/context-menu/userinfoContext.js";
+import type { UserInfoCommand } from "../../interactions/utility/userinfo.js";
+import { EMOJI_NEWBIE, TAB, Colors } from "../../util/constants.js";
+import { formatUserFlag, formatApplicationFlag } from "../../util/formatting.js";
+import { truncateEmbed } from "../../util/index.js";
 
 kleur.enabled = true;
 

@@ -14,15 +14,15 @@ import dayjs from "dayjs";
 import { type APIEmbed, ButtonStyle, ComponentType, type Webhook, type Message, type TextChannel } from "discord.js";
 import { nanoid } from "nanoid";
 import { inject, injectable } from "tsyringe";
-import { formatMessageToEmbed } from "../functions/logging/formatMessageToEmbed.js";
-import { formatMessagesToAttachment } from "../functions/logging/formatMessagesToAttachment.js";
-import { fetchMessages, orderMessages, pruneMessages } from "../functions/pruning/pruneMessages.js";
-import { checkLogChannel } from "../functions/settings/checkLogChannel.js";
-import { getGuildSetting, SettingsKeys } from "../functions/settings/getGuildSetting.js";
-import type { ClearCommand, ClearContextCommand } from "../interactions/index.js";
-import { kWebhooks } from "../tokens.js";
-import { Color, DATE_FORMAT_LOGFILE } from "../util/constants.js";
-import { parseMessageLink, resolveMessage } from "../util/resolveMessage.js";
+import { formatMessageToEmbed } from "../../functions/logging/formatMessageToEmbed.js";
+import { formatMessagesToAttachment } from "../../functions/logging/formatMessagesToAttachment.js";
+import { fetchMessages, orderMessages, pruneMessages } from "../../functions/pruning/pruneMessages.js";
+import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
+import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
+import type { ClearCommand, ClearContextCommand } from "../../interactions/index.js";
+import { kWebhooks } from "../../tokens.js";
+import { Color, DATE_FORMAT_LOGFILE } from "../../util/constants.js";
+import { parseMessageLink, resolveMessage } from "../../util/resolveMessage.js";
 
 async function resolveSnowflakeOrLink(interaction: InteractionParam, arg: string, argumentName: string) {
 	if (validateSnowflake(arg)) {
