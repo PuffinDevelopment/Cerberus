@@ -23,8 +23,20 @@ export enum Colors {
 	DiscordDanger = 0xed4245,
 }
 
+export const enum ThreatLevelColor {
+	Level0 = 0x7ef31f,
+	Level1 = 0x80f31f,
+	Level2 = 0xa5de0b,
+	Level3 = 0xc7c101,
+	Level4 = 0xe39e03,
+	Level5 = 0xf6780f,
+	Level6 = 0xfe5326,
+	Level7 = 0xfb3244,
+}
+
 export const CASE_REASON_MAX_LENGTH = 500;
 export const CASE_REASON_MIN_LENGTH = 3;
+export const HISTORY_DESCRIPTION_MAX_LENGTH = 80;
 
 export const MENTION_THRESHOLD = 10;
 export const MENTION_EXPIRE_SECONDS = 60;

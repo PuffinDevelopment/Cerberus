@@ -3,6 +3,7 @@ import process from "node:process";
 import { logger } from "@yuudachi/framework";
 import { Routes, REST } from "discord.js";
 import {
+	BanCommand,
 	ClearCommand,
 	ClearContextCommand,
 	ReasonCommand,
@@ -17,6 +18,7 @@ try {
 
 	const body: unknown[] = [
 		// Moderation
+		BanCommand,
 		ClearCommand,
 		ClearContextCommand,
 		ReasonCommand,
