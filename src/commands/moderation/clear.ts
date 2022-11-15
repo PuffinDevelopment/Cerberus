@@ -11,7 +11,15 @@ import {
 } from "@yuudachi/framework";
 import type { ArgsParam, InteractionParam, CommandMethod } from "@yuudachi/framework/types";
 import dayjs from "dayjs";
-import { type APIEmbed, ButtonStyle, ComponentType, type Webhook, type Message, type TextChannel } from "discord.js";
+import {
+	type APIButtonComponent,
+	type APIEmbed,
+	ButtonStyle,
+	ComponentType,
+	type Webhook,
+	type Message,
+	type TextChannel,
+} from "discord.js";
 import { nanoid } from "nanoid";
 import { inject, injectable } from "tsyringe";
 import { formatMessageToEmbed } from "../../functions/logging/formatMessageToEmbed.js";
@@ -22,6 +30,7 @@ import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuild
 import type { ClearCommand, ClearContextCommand } from "../../interactions/index.js";
 import { kWebhooks } from "../../tokens.js";
 import { Color, DATE_FORMAT_LOGFILE } from "../../util/constants.js";
+import { createMessageLinkButton } from "../../util/createMessageLinkButton.js";
 import { parseMessageLink, resolveMessage } from "../../util/resolveMessage.js";
 
 async function resolveSnowflakeOrLink(interaction: InteractionParam, arg: string, argumentName: string) {
@@ -89,9 +98,11 @@ export default class extends Command<typeof ClearCommand | typeof ClearContextCo
 		];
 
 		const embeds: APIEmbed[] = [];
+		const buttons: APIButtonComponent[] = [cancelButton, clearButton];
 
 		if (!messages.has(oldest.id)) {
 			embeds.push(formatMessageToEmbed(earliest as Message<true>));
+			buttons.push(createMessageLinkButton(earliest as Message<true>));
 			confirmParts.push(
 				`Note: You can only clear messages that are up to 12 hours old. The oldest message that will be cleared is shown below.`,
 				"",
@@ -100,7 +111,7 @@ export default class extends Command<typeof ClearCommand | typeof ClearContextCo
 
 		await interaction.editReply({
 			content: confirmParts.join("\n"),
-			components: [createMessageActionRow([cancelButton, clearButton])],
+			components: [createMessageActionRow(buttons)],
 			embeds,
 		});
 
