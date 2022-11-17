@@ -7,6 +7,7 @@ import {
 	ClearCommand,
 	ClearContextCommand,
 	ReasonCommand,
+	GithubCommand,
 	UserInfoCommand,
 	UserInfoContextCommand,
 } from "./interactions/index.js";
@@ -24,6 +25,7 @@ try {
 		ReasonCommand,
 
 		// Utility
+		GithubCommand,
 		UserInfoCommand,
 		UserInfoContextCommand,
 	];
