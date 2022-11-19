@@ -1,28 +1,27 @@
 import { ApplicationCommandOptionType } from "discord.js";
 import { CASE_REASON_MAX_LENGTH, CASE_REASON_MIN_LENGTH } from "../../Constants.js";
 
-export const ReasonCommand = {
-	name: "reason",
-	description: "Change the reason of actions",
+export const WarnCommand = {
+	name: "warn",
+	description: "Warn a user",
 	options: [
 		{
-			name: "case",
-			description: "The first case to change",
-			type: ApplicationCommandOptionType.Integer,
+			name: "user",
+			description: "The user to action",
+			type: ApplicationCommandOptionType.User,
 			required: true,
 		},
 		{
 			name: "reason",
-			description: "The reason",
+			description: "The reason of this action",
 			type: ApplicationCommandOptionType.String,
-			required: true,
 			autocomplete: true,
 			min_length: CASE_REASON_MIN_LENGTH,
 			max_length: CASE_REASON_MAX_LENGTH,
 		},
 		{
-			name: "last_case",
-			description: "The last case to change",
+			name: "case_reference",
+			description: "The reference case",
 			type: ApplicationCommandOptionType.Integer,
 		},
 	],

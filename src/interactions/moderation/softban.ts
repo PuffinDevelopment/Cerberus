@@ -1,9 +1,9 @@
 import { ApplicationCommandOptionType } from "discord.js";
 import { CASE_REASON_MAX_LENGTH, CASE_REASON_MIN_LENGTH } from "../../Constants.js";
 
-export const BanCommand = {
-	name: "ban",
-	description: "Ban a member of(f) this guild",
+export const SoftbanCommand = {
+	name: "softban",
+	description: "Softban a member of(f) this guild",
 	options: [
 		{
 			name: "user",
@@ -24,8 +24,8 @@ export const BanCommand = {
 			description: "The amount of days to delete messages for",
 			type: ApplicationCommandOptionType.Integer,
 			choices: [
-				{ name: "0 days (default)", value: 0 },
-				{ name: "1 day", value: 1 },
+				{ name: "0 days", value: 0 },
+				{ name: "1 day (default)", value: 1 },
 				{ name: "2 days", value: 2 },
 				{ name: "3 days", value: 3 },
 				{ name: "4 days", value: 4 },

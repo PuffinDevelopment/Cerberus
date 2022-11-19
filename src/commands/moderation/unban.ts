@@ -1,4 +1,3 @@
-import { getModelForClass } from "@typegoose/typegoose";
 import { Command, logger, createButton, truncateEmbed, createMessageActionRow } from "@yuudachi/framework";
 import type { ArgsParam, InteractionParam } from "@yuudachi/framework/types";
 import { ButtonStyle, ComponentType } from "discord.js";
@@ -7,26 +6,23 @@ import type { Redis } from "ioredis";
 import { nanoid } from "nanoid";
 import { inject, injectable } from "tsyringe";
 import { CASE_REASON_MAX_LENGTH } from "../../Constants.js";
-import { CaseAction, createCase } from "../../functions/cases/createCase.js";
-import { generateCasePayload } from "../../functions/logging/generateCasePayload.js";
+import { deleteCase } from "../../functions/cases/deleteCase.js";
 import { upsertCaseLog } from "../../functions/logging/upsertCaseLog.js";
 import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
 import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
-import type { BanCommand } from "../../interactions/index.js";
-import { cases } from "../../models/cases.js";
+import type { UnbanCommand } from "../../interactions/index.js";
 import { kRedis } from "../../tokens.js";
 import { generateHistory } from "../../util/generateHistory.js";
 
 @injectable()
-export default class extends Command<typeof BanCommand> {
+export default class extends Command<typeof UnbanCommand> {
 	public constructor(@inject(kRedis) public readonly redis: Redis) {
 		super();
 	}
 
-	public override async chatInput(interaction: InteractionParam, args: ArgsParam<typeof BanCommand>): Promise<void> {
+	public override async chatInput(interaction: InteractionParam, args: ArgsParam<typeof UnbanCommand>): Promise<void> {
 		const reply = await interaction.deferReply({ ephemeral: true });
 
-		const mongo = getModelForClass(cases);
 		const modLogChannel = checkLogChannel(
 			interaction.guild,
 			await getGuildSetting(interaction.guildId, SettingsKeys.ModLogChannelId),
@@ -36,32 +32,22 @@ export default class extends Command<typeof BanCommand> {
 			throw new Error("No mod log channel has been initialized yet.");
 		}
 
-		let alreadyBanned = false;
 		try {
 			await interaction.guild.bans.fetch(args.user.user.id);
-			alreadyBanned = true;
-		} catch {}
-
-		if (alreadyBanned) {
-			throw new Error(`${args.user.user.toString()} - ${args.user.user.tag} (${args.user.user.id}) is already banned.`);
-		}
-
-		if (args.user.member && !args.user.member.bannable) {
-			throw new Error(
-				`Missing permissions to ban ${args.user.user.toString()} - ${args.user.user.tag} (${args.user.user.id})`,
-			);
+		} catch {
+			throw new Error(`${args.user.user.toString()} - ${args.user.user.tag} (${args.user.user.id}) is not banned.`);
 		}
 
 		if (args.reason && args.reason.length >= CASE_REASON_MAX_LENGTH) {
 			throw new Error(`Maximum length of \`${CASE_REASON_MAX_LENGTH}\` for reason exceeded.`);
 		}
 
-		const banKey = nanoid();
+		const unbanKey = nanoid();
 		const cancelKey = nanoid();
 
-		const banButton = createButton({
-			label: "Ban",
-			customId: banKey,
+		const unbanButton = createButton({
+			label: "Unban",
+			customId: unbanKey,
 			style: ButtonStyle.Danger,
 		});
 		const cancelButton = createButton({
@@ -73,9 +59,11 @@ export default class extends Command<typeof BanCommand> {
 		const embed = truncateEmbed(await generateHistory(interaction, args.user));
 
 		await interaction.editReply({
-			content: `Do you really want to ban ${args.user.user.toString()} - ${args.user.user.tag} (${args.user.user.id})?`,
+			content: `Do you really want to unban ${args.user.user.toString()} - ${args.user.user.tag} (${
+				args.user.user.id
+			})?`,
 			embeds: [embed],
-			components: [createMessageActionRow([cancelButton, banButton])],
+			components: [createMessageActionRow([cancelButton, unbanButton])],
 		});
 
 		const collectedInteraction = await reply
@@ -87,7 +75,7 @@ export default class extends Command<typeof BanCommand> {
 			.catch(async () => {
 				try {
 					await interaction.editReply({
-						content: "Actiont timer ran out.",
+						content: "Action timer ran out.",
 						components: [],
 					});
 				} catch (error_) {
@@ -100,30 +88,24 @@ export default class extends Command<typeof BanCommand> {
 
 		if (collectedInteraction?.customId === cancelKey) {
 			await collectedInteraction.update({
-				content: `Canceled ban on ${args.user.user.toString()} - ${args.user.user.tag} (${args.user.user.id})`,
+				content: `Canceled unban on ${args.user.user.toString()} - ${args.user.user.tag} (${args.user.user.id})`,
 				components: [],
 			});
-		} else if (collectedInteraction?.customId === banKey) {
+		} else if (collectedInteraction?.customId === unbanKey) {
 			await collectedInteraction.deferUpdate();
 
-			await this.redis.setex(`guild:${collectedInteraction.guildId}:user:${args.user.user.id}:ban`, 15, "");
-			const case_ = await createCase(
-				collectedInteraction.guild,
-				generateCasePayload({
-					guildId: collectedInteraction.guildId,
-					user: collectedInteraction.user,
-					caseId: await mongo.nextCase(collectedInteraction.guildId),
-					args: {
-						...args,
-						days: Math.min(Math.max(Number(args.days ?? 0), 0), 7),
-					},
-					action: CaseAction.Ban,
-				}),
-			);
+			await this.redis.setex(`guild:${collectedInteraction.guildId}:user:${args.user.user.id}:unban`, 15, "");
+			const case_ = await deleteCase({
+				guild: collectedInteraction.guild,
+				user: collectedInteraction.user,
+				target: args.user.user,
+				reason: args.reason,
+				manual: true,
+			});
 			await upsertCaseLog(collectedInteraction.guild, collectedInteraction.user, case_);
 
 			await collectedInteraction.editReply({
-				content: `Successfully banned ${args.user.user.toString()} - ${args.user.user.tag} (${args.user.user.id})`,
+				content: `Successfully unbanned ${args.user.user.toString()} - ${args.user.user.tag} (${args.user.user.id})`,
 				components: [],
 			});
 		}
