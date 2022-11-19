@@ -22,8 +22,9 @@ export async function updateCase(case_: PatchCase) {
 	const queries = removeUndefinedKeys(updates);
 
 	const updatedCase = (await mongo.findOneAndUpdate(
-		{ guild_id: case_.guildId, case_id: case_.caseId },
-		queries,
+		{ guild_id: case_.guildId, case_id: case_.caseId! },
+		{ $set: queries },
+		{ returnOriginal: false },
 	)) as RawCase;
 
 	return transformCase(updatedCase);
