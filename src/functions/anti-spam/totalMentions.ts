@@ -2,9 +2,9 @@ import { container } from "@yuudachi/framework";
 import type { Snowflake } from "discord.js";
 import { FormattingPatterns } from "discord.js";
 import type { Redis } from "ioredis";
+import { MENTION_EXPIRE_SECONDS } from "../../Constants.js";
 import { kRedis } from "../../tokens.js";
 import { removeCodeBlocks } from "../../util/codeBlock.js";
-import { MENTION_EXPIRE_SECONDS } from "../../util/constants.js";
 
 export async function totalMentions(guildId: Snowflake, userId: Snowflake, content: string) {
 	const redis = container.resolve<Redis>(kRedis);

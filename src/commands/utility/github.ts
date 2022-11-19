@@ -1,11 +1,11 @@
 import { Command } from "@yuudachi/framework";
 import type { ArgsParam, InteractionParam } from "@yuudachi/framework/types";
+import { DEFAULT_REPO, DEFAULT_REPO_OWNER, GITHUB_EMOJI_COMMIT } from "../../Constants.js";
 import { commitInfo } from "../../functions/github/commit.js";
 import { githubInfo, validateGitHubName } from "../../functions/github/github.js";
 import type { GitHubAPIResult } from "../../functions/github/githubInterface.js";
 import { issueInfo } from "../../functions/github/issue.js";
 import type { GithubCommand } from "../../interactions/index.js";
-import { DEFAULT_REPO, DEFAULT_REPO_OWNER, GITHUB_EMOJI_COMMIT } from "../../util/constants.js";
 
 export default class extends Command<typeof GithubCommand> {
 	public override async chatInput(interaction: InteractionParam, args: ArgsParam<typeof GithubCommand>): Promise<void> {

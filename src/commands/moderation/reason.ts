@@ -2,6 +2,7 @@ import { Command, logger, createButton, truncate, createMessageActionRow } from 
 import type { ArgsParam, InteractionParam } from "@yuudachi/framework/types";
 import { ComponentType, ButtonStyle, hyperlink, messageLink } from "discord.js";
 import { nanoid } from "nanoid";
+import { CASE_REASON_MAX_LENGTH } from "../../Constants.js";
 import type { Case } from "../../functions/cases/createCase.js";
 import { getCase } from "../../functions/cases/getCase.js";
 import { updateCase } from "../../functions/cases/updateCase.js";
@@ -9,7 +10,6 @@ import { upsertCaseLog } from "../../functions/logging/upsertCaseLog.js";
 import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
 import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
 import type { ReasonCommand } from "../../interactions/index.js";
-import { CASE_REASON_MAX_LENGTH } from "../../util/constants.js";
 
 export default class extends Command<typeof ReasonCommand> {
 	public override async chatInput(interaction: InteractionParam, args: ArgsParam<typeof ReasonCommand>): Promise<void> {

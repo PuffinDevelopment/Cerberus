@@ -15,9 +15,9 @@ import {
 	ApplicationFlagsBitField,
 } from "discord.js";
 import kleur from "kleur";
+import { EMOJI_NEWBIE, TAB, Colors } from "../../Constants.js";
 import type { UserInfoContextCommand } from "../../interactions/context-menu/userinfoContext.js";
 import type { UserInfoCommand } from "../../interactions/utility/userinfo.js";
-import { EMOJI_NEWBIE, TAB, Colors } from "../../util/constants.js";
 import { formatUserFlag, formatApplicationFlag } from "../../util/formatUserFlags.js";
 import { truncateEmbed } from "../../util/index.js";
 

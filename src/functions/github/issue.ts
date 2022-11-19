@@ -11,7 +11,7 @@ import {
 	GITHUB_EMOJI_PR_DRAFT,
 	GITHUB_EMOJI_PR_MERGED,
 	GITHUB_EMOJI_PR_OPEN,
-} from "../../util/constants.js";
+} from "../../Constants.js";
 import { GitHubReviewDecision, isPR } from "./githubInterface.js";
 import type { GitHubAPIResult } from "./githubInterface.js";
 

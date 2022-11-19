@@ -8,7 +8,7 @@ import {
 	type Snowflake,
 } from "discord.js";
 import kleur from "kleur";
-import { DATE_FORMAT_WITH_SECONDS } from "../../util/constants.js";
+import { DATE_FORMAT_WITH_SECONDS } from "../../Constants.js";
 
 kleur.enabled = true;
 

@@ -1,6 +1,6 @@
 import { truncateEmbed } from "@yuudachi/framework";
 import type { Message } from "discord.js";
-import { Color } from "../../util/constants.js";
+import { Color } from "../../Constants.js";
 
 export function formatMessageToEmbed(message: Message<true>) {
 	let embed = truncateEmbed({

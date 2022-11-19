@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import { container } from "@yuudachi/framework";
 import type { Snowflake } from "discord.js";
 import type { Redis } from "ioredis";
+import { SPAM_EXPIRE_SECONDS } from "../../Constants.js";
 import { kRedis } from "../../tokens.js";
-import { SPAM_EXPIRE_SECONDS } from "../../util/constants.js";
 
 export function createContentHash(content: string) {
 	return createHash("md5").update(content.toLowerCase()).digest("hex");

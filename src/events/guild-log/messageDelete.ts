@@ -3,9 +3,9 @@ import { logger, addFields, truncateEmbed } from "@yuudachi/framework";
 import type { Event } from "@yuudachi/framework/types";
 import { ChannelType, Client, Events, messageLink, type Message, MessageType } from "discord.js";
 import { injectable } from "tsyringe";
+import { Color } from "../../Constants.js";
 import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
 import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
-import { Color } from "../../util/constants.js";
 
 @injectable()
 export default class implements Event {

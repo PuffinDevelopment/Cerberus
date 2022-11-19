@@ -29,17 +29,17 @@ export async function generateCaseLog(case_: Case) {
 	if (case_.reason) {
 		msg += `\n**Reason:** ${case_.reason}`;
 	} else {
-		msg += `\n**Reason:** Use \`</reason:1040248611780448276> ${case_.caseId} <...reason>\` to set a reason for this case`;
+		msg += `\n**Reason:** Use </reason:1040248611780448276> \`${case_.caseId} <...reason>\` to set a reason for this case`;
 	}
 
 	if (case_.refId) {
 		const reference = await mongo.findOne({ guild_id: case_.guildId }, { ref_id: case_.refId });
 
-		if (Reflect.has(reference ?? {}, "log_message_id")) {
+		if (Reflect.has(reference ?? {}, "context_message_id")) {
 			msg += `\n**Case Reference:** [#${case_.refId}](${messageLink(
-				case_.guildId,
 				modLogChannelId,
 				reference!.context_message_id!,
+				case_.guildId,
 			)})`;
 		}
 	}
