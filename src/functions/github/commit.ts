@@ -1,6 +1,6 @@
 import process from "node:process";
 import fetch from "node-fetch";
-import { GITHUB_BASE_URL } from "../../util/constants.js";
+import { GITHUB_BASE_URL } from "../../Constants.js";
 import type { GitHubAPIResult } from "./githubInterface.js";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;

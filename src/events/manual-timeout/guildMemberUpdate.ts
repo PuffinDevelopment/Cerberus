@@ -7,6 +7,7 @@ import { Client, Events, type GuildMember, AuditLogEvent } from "discord.js";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import type { Redis } from "ioredis";
 import { inject, injectable } from "tsyringe";
+import { AUDIT_LOG_WAIT_SECONDS } from "../../Constants.js";
 import { createCase, CaseAction } from "../../functions/cases/createCase.js";
 import { deleteCase } from "../../functions/cases/deleteCase.js";
 import { generateCasePayload } from "../../functions/logging/generateCasePayload.js";
@@ -15,7 +16,6 @@ import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
 import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
 import { cases } from "../../models/cases.js";
 import { kRedis } from "../../tokens.js";
-import { AUDIT_LOG_WAIT_SECONDS } from "../../util/constants.js";
 
 @injectable()
 export default class implements Event {

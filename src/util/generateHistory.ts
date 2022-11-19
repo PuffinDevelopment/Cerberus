@@ -17,9 +17,9 @@ import {
 	TimestampStyles,
 	messageLink,
 } from "discord.js";
+import { Color, HISTORY_DESCRIPTION_MAX_LENGTH, ThreatLevelColor } from "../Constants.js";
 import { getGuildSetting, SettingsKeys } from "../functions/settings/getGuildSetting.js";
 import { cases } from "../models/cases.js";
-import { Color, HISTORY_DESCRIPTION_MAX_LENGTH, ThreatLevelColor } from "../util/constants.js";
 import { ACTION_KEYS } from "./actionKeys.js";
 
 dayjs.extend(relativeTime);
@@ -117,7 +117,7 @@ function actionKeyLabel(key: typeof ACTION_KEYS[number]) {
 		case "timeout":
 			return "TIMEOUT";
 		default:
-			return "UNKNOWN";
+			return "TIMEOUTEND";
 	}
 }
 
@@ -138,9 +138,7 @@ export async function generateCaseHistory(
 ) {
 	const moduleLogChannelId = await getGuildSetting(interaction.guildId, SettingsKeys.ModLogChannelId);
 
-	const cases = await mongo
-		.find({ guild_id: interaction.guildId, target_id: target.user.id, action: { $nin: [1, 8] } })
-		.sort({ created_at: -1 });
+	const cases = await mongo.find({ guild_id: interaction.guildId, target_id: target.user.id }).sort({ created_at: 1 });
 
 	const caseCounter = cases.reduce((count: CaseFooter, case_) => {
 		const action = ACTION_KEYS[case_.action]!;
@@ -149,11 +147,11 @@ export async function generateCaseHistory(
 	}, {});
 
 	const values: [number, number, number, number, number, number] = [
-		caseCounter.unban ?? 0,
 		caseCounter.warn ?? 0,
 		caseCounter.kick ?? 0,
 		caseCounter.softban ?? 0,
 		caseCounter.ban ?? 0,
+		caseCounter.unban ?? 0,
 		caseCounter.timeout ?? 0,
 	];
 	const colorIndex = Math.min(

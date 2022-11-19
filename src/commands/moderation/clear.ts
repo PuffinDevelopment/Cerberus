@@ -22,6 +22,7 @@ import {
 } from "discord.js";
 import { nanoid } from "nanoid";
 import { inject, injectable } from "tsyringe";
+import { Color, DATE_FORMAT_LOGFILE } from "../../Constants.js";
 import { formatMessageToEmbed } from "../../functions/logging/formatMessageToEmbed.js";
 import { formatMessagesToAttachment } from "../../functions/logging/formatMessagesToAttachment.js";
 import { fetchMessages, orderMessages, pruneMessages } from "../../functions/pruning/pruneMessages.js";
@@ -29,7 +30,6 @@ import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
 import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
 import type { ClearCommand, ClearContextCommand } from "../../interactions/index.js";
 import { kWebhooks } from "../../tokens.js";
-import { Color, DATE_FORMAT_LOGFILE } from "../../util/constants.js";
 import { createMessageLinkButton } from "../../util/createMessageLinkButton.js";
 import { parseMessageLink, resolveMessage } from "../../util/resolveMessage.js";
 

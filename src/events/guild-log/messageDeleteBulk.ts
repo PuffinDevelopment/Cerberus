@@ -7,10 +7,10 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import utc from "dayjs/plugin/utc.js";
 import { Client, Events, type Snowflake } from "discord.js";
 import { injectable } from "tsyringe";
+import { Color } from "../../Constants.js";
 import { formatMessagesToAttachment } from "../../functions/logging/formatMessagesToAttachment.js";
 import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
 import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
-import { Color } from "../../util/constants.js";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
