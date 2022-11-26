@@ -34,6 +34,8 @@ export const enum ThreatLevelColor {
 	Level7 = 0xfb3244,
 }
 
+export const OP_DELIMITER = "-";
+
 export const DEFAULT_REPO_OWNER = "PuffinDevelopment";
 export const DEFAULT_REPO = "Cerberus";
 export const GITHUB_BASE_URL = "https://api.github.com/graphql";
@@ -47,7 +49,15 @@ export const GITHUB_EMOJI_COMMIT = "<:commit:852713964889702410>";
 
 export const CASE_REASON_MAX_LENGTH = 500;
 export const CASE_REASON_MIN_LENGTH = 3;
+
 export const HISTORY_DESCRIPTION_MAX_LENGTH = 80;
+
+export const REPORT_REASON_MAX_LENGTH = 1_500;
+export const REPORT_REASON_MIN_LENGTH = 10;
+
+export const REPORT_DUPLICATE_PRE_EXPIRE_SECONDS = 3;
+export const REPORT_DUPLICATE_EXPIRE_SECONDS = 15 * 60;
+export const REPORT_MESSAGE_CONTEXT_LIMIT = 20;
 
 export const MENTION_THRESHOLD = 10;
 export const MENTION_EXPIRE_SECONDS = 60;

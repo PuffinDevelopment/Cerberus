@@ -1,3 +1,4 @@
+import "dotenv/config";
 import "reflect-metadata";
 import { URL, fileURLToPath, pathToFileURL } from "node:url";
 import {

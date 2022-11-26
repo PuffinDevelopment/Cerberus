@@ -4,15 +4,24 @@ import { logger } from "@yuudachi/framework";
 import { Routes, REST } from "discord.js";
 import {
 	BanCommand,
+	CaseLookupCommand,
 	ClearCommand,
 	ClearContextCommand,
+	DurationCommand,
+	HistoryCommand,
+	HistoryUserContextCommand,
 	KickCommand,
 	ReasonCommand,
+	ReferenceCommand,
+	ReportUtilsCommand,
 	SoftbanCommand,
 	TimeoutCommand,
 	UnbanCommand,
 	WarnCommand,
 	GithubCommand,
+	ReportCommand,
+	ReportMessageContextCommand,
+	ReportUserContextCommand,
 	UserInfoCommand,
 	UserInfoContextCommand,
 } from "./interactions/index.js";
@@ -25,10 +34,16 @@ try {
 	const body: unknown[] = [
 		// Moderation
 		BanCommand,
+		CaseLookupCommand,
 		ClearCommand,
 		ClearContextCommand,
+		DurationCommand,
+		HistoryCommand,
+		HistoryUserContextCommand,
 		KickCommand,
 		ReasonCommand,
+		ReferenceCommand,
+		ReportUtilsCommand,
 		SoftbanCommand,
 		TimeoutCommand,
 		UnbanCommand,
@@ -36,6 +51,9 @@ try {
 
 		// Utility
 		GithubCommand,
+		ReportCommand,
+		ReportMessageContextCommand,
+		ReportUserContextCommand,
 		UserInfoCommand,
 		UserInfoContextCommand,
 	];
