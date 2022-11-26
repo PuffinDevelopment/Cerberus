@@ -15,6 +15,15 @@ export class settings {
 
 	@prop({ required: true })
 	mod_role_id!: string;
+
+	@prop({ required: true })
+	report_channel_id!: string;
+
+	@prop({ required: true })
+	report_status_tags!: string[];
+
+	@prop({ required: true })
+	report_type_tags!: string[];
 }
 
 export default getModelForClass(settings);

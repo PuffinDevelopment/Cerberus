@@ -37,7 +37,7 @@ export class cases {
 	context_message_id!: string;
 
 	@prop({ default: null })
-	action_expiration!: Date;
+	action_expiration!: string;
 
 	@prop({ default: true })
 	action_processed!: boolean;

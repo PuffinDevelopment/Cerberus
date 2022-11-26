@@ -7,7 +7,7 @@ export type RawCase = {
 	action_processed: boolean;
 	case_id: number;
 	context_message_id: Snowflake | null;
-	created_at: string;
+	created_at: Date;
 	guild_id: Snowflake;
 	mod_id: Snowflake;
 	mod_tag: string;
