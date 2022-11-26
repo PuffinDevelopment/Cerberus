@@ -16,11 +16,14 @@ import {
 	time,
 	TimestampStyles,
 	messageLink,
+	channelLink,
 } from "discord.js";
 import { Color, HISTORY_DESCRIPTION_MAX_LENGTH, ThreatLevelColor } from "../Constants.js";
+import { ReportStatus } from "../functions/reports/createReport.js";
 import { getGuildSetting, SettingsKeys } from "../functions/settings/getGuildSetting.js";
 import { cases } from "../models/cases.js";
-import { ACTION_KEYS } from "./actionKeys.js";
+import { reports } from "../models/reports.js";
+import { ACTION_KEYS, REPORT_KEYS } from "./actionKeys.js";
 
 dayjs.extend(relativeTime);
 
@@ -52,7 +55,8 @@ type HistoryRecord = {
 	label: string;
 };
 
-const mongo = getModelForClass(cases);
+const cases_model = getModelForClass(cases);
+const report_model = getModelForClass(reports);
 
 function generateHistoryEmbed(
 	author: User,
@@ -138,7 +142,9 @@ export async function generateCaseHistory(
 ) {
 	const moduleLogChannelId = await getGuildSetting(interaction.guildId, SettingsKeys.ModLogChannelId);
 
-	const cases = await mongo.find({ guild_id: interaction.guildId, target_id: target.user.id }).sort({ created_at: 1 });
+	const cases = await cases_model
+		.find({ guild_id: interaction.guildId, target_id: target.user.id })
+		.sort({ created_at: 1 });
 
 	const caseCounter = cases.reduce((count: CaseFooter, case_) => {
 		const action = ACTION_KEYS[case_.action]!;
@@ -175,6 +181,80 @@ export async function generateCaseHistory(
 		colors[colorIndex] ?? Color.DiscordEmbedBackground,
 		records,
 		actionSummary(...values),
+	);
+}
+
+function reportKeyLabel(key: typeof REPORT_KEYS[number]) {
+	switch (key) {
+		case "pending":
+			return "PENDING";
+		case "approved":
+			return "APPROVED";
+		case "rejected":
+			return "REJECTED";
+		case "spam":
+			return "SPAM";
+		default:
+			return "UNKNOWN";
+	}
+}
+
+function reportSummary(reported: number, authored: number, spam: number) {
+	return [`${reported}x reported`, `${authored} reports authored`, `${spam} spam reports`].join(", ");
+}
+
+export async function generateReportHistory(
+	interaction: ButtonInteraction<"cached"> | CommandInteraction<"cached"> | SelectMenuInteraction<"cached">,
+	target: { member?: GuildMember | undefined; user: User },
+) {
+	const rawReports = await report_model
+		.find({
+			guildId: interaction.guildId,
+			$or: [{ authorId: target.user.id }, { targetId: target.user.id }],
+			status: { $ne: ReportStatus.Rejected },
+		})
+		.sort({ createdAt: -1 });
+
+	const reports = rawReports.filter(
+		(report) => !(report.status === ReportStatus.Spam && report.target_id === target.user.id),
+	);
+
+	const colorIndex = Math.min(
+		reports.filter((report) => report.status === ReportStatus.Approved || report.status === ReportStatus.Spam).length,
+		colors.length - 1,
+	);
+
+	let authorCounter = 0;
+	let targetCounter = 0;
+	let authoredSpamCounter = 0;
+
+	const records: HistoryRecord[] = reports.map((report) => {
+		if (report.author_id === target.user.id) {
+			authorCounter++;
+
+			if (report.status === ReportStatus.Spam) {
+				authoredSpamCounter++;
+			}
+		} else if (report.target_id === target.user.id) {
+			targetCounter++;
+		}
+
+		const userRoleString = report.author_id === target.user.id ? "Author" : "Target";
+		return {
+			created: report.created_at,
+			identifierLabel: `#${report.report_id} (${userRoleString})`,
+			identifierURL: report.log_post_id ? channelLink(report.log_post_id, report.guild_id) : undefined,
+			label: reportKeyLabel(REPORT_KEYS[report.status]!),
+			description: report.reason ?? undefined,
+		};
+	});
+
+	return generateHistoryEmbed(
+		target.user,
+		"Report History",
+		colors[colorIndex] ?? Color.DiscordEmbedBackground,
+		records,
+		reportSummary(targetCounter, authorCounter, authoredSpamCounter),
 	);
 }
 
@@ -230,6 +310,7 @@ export function generateUserInfo(target: { member?: GuildMember | undefined; use
 
 export enum HistoryType {
 	Case,
+	Report,
 }
 
 export async function generateHistory(
@@ -244,6 +325,14 @@ export async function generateHistory(
 			embed = {
 				...embed,
 				...(await generateCaseHistory(interaction, target)),
+			};
+			break;
+		}
+
+		case HistoryType.Report: {
+			embed = {
+				...embed,
+				...(await generateReportHistory(interaction, target)),
 			};
 			break;
 		}
