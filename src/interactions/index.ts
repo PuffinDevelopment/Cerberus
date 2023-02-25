@@ -1,6 +1,5 @@
 export * from "./context-menu/clearContext.js";
 export * from "./context-menu/historyContext.js";
-export * from "./context-menu/userinfoContext.js";
 export * from "./context-menu/report/message.js";
 export * from "./context-menu/report/user.js";
 export * from "./moderation/ban.js";
@@ -16,6 +15,4 @@ export * from "./moderation/softban.js";
 export * from "./moderation/timeout.js";
 export * from "./moderation/unban.js";
 export * from "./moderation/warn.js";
-export * from "./utility/github.js";
 export * from "./utility/report.js";
-export * from "./utility/userinfo.js";

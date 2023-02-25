@@ -18,12 +18,9 @@ import {
 	TimeoutCommand,
 	UnbanCommand,
 	WarnCommand,
-	GithubCommand,
 	ReportCommand,
 	ReportMessageContextCommand,
 	ReportUserContextCommand,
-	UserInfoCommand,
-	UserInfoContextCommand,
 } from "./interactions/index.js";
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
@@ -50,12 +47,9 @@ try {
 		WarnCommand,
 
 		// Utility
-		GithubCommand,
 		ReportCommand,
 		ReportMessageContextCommand,
 		ReportUserContextCommand,
-		UserInfoCommand,
-		UserInfoContextCommand,
 	];
 
 	await rest.put(Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!), {

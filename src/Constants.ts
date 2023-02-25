@@ -36,17 +36,6 @@ export const enum ThreatLevelColor {
 
 export const OP_DELIMITER = "-";
 
-export const DEFAULT_REPO_OWNER = "PuffinDevelopment";
-export const DEFAULT_REPO = "Cerberus";
-export const GITHUB_BASE_URL = "https://api.github.com/graphql";
-export const GITHUB_EMOJI_PR_OPEN = "<:pr_open:852715356622553088>";
-export const GITHUB_EMOJI_PR_CLOSED = "<:pr_closed:852715338268409887>";
-export const GITHUB_EMOJI_PR_MERGED = "<:pr_merge:852715380282753044>";
-export const GITHUB_EMOJI_PR_DRAFT = "<:pr_draft:852715368888008714>";
-export const GITHUB_EMOJI_ISSUE_OPEN = "<:issue_open:852714230280486942>";
-export const GITHUB_EMOJI_ISSUE_CLOSED = "<:issue_closed:852714146335555594>";
-export const GITHUB_EMOJI_COMMIT = "<:commit:852713964889702410>";
-
 export const CASE_REASON_MAX_LENGTH = 500;
 export const CASE_REASON_MIN_LENGTH = 3;
 
@@ -72,7 +61,3 @@ export const DATE_FORMAT_LOGFILE = "YYYY-MM-DD_HH-mm-ss";
 export const DATE_FORMAT_WITH_SECONDS = "YYYY/MM/DD HH:mm:ss";
 
 export const DISCORD_USER_FLAG_SPAMMER = 1 << 20;
-
-export const TAB = "\u200B \u200B \u200B" as const;
-
-export const EMOJI_NEWBIE = "<:newbie:962332319623049226>" as const;
