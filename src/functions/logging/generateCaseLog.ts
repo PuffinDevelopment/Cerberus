@@ -1,3 +1,4 @@
+import { ms } from "@naval-base/ms";
 import { getModelForClass } from "@typegoose/typegoose";
 import { messageLink, time, TimestampStyles } from "discord.js";
 import { cases } from "../../models/cases.js";
@@ -13,7 +14,12 @@ export async function generateCaseLog(case_: Case) {
 	let msg = `**Member**: \`${case_.targetTag}\` (${case_.targetId})\n**Action**: ${action}`;
 
 	if (case_.actionExpiration) {
-		msg += `\n**Expiration**: ${time(new Date(case_.actionExpiration), TimestampStyles.RelativeTime)}`;
+		const expirationDate = new Date(case_.actionExpiration);
+
+		msg += `\n**Expiration**: \`${ms(expirationDate.getTime() - Date.now())}\` ${time(
+			expirationDate,
+			TimestampStyles.RelativeTime,
+		)}`;
 	}
 
 	if (case_.contextMessageId) {
@@ -22,14 +28,18 @@ export async function generateCaseLog(case_: Case) {
 			{ context_message_id: case_.contextMessageId },
 		);
 		if (Reflect.has(contextMessage ?? {}, "channel_id")) {
-			msg += `**Context:** ["Beam me up Cerr"](${messageLink(case_.guildId, modLogChannelId, case_.contextMessageId)})`;
+			msg += `**Context:** ["Beam me up Cerby"](${messageLink(
+				case_.guildId,
+				modLogChannelId,
+				case_.contextMessageId,
+			)})`;
 		}
 	}
 
 	if (case_.reason) {
 		msg += `\n**Reason:** ${case_.reason}`;
 	} else {
-		msg += `\n**Reason:** Use </reason:1040248611780448276> \`${case_.caseId} <...reason>\` to set a reason for this case`;
+		msg += `\n**Reason:** Use \`/reason ${case_.caseId} <...reason>\` to set a reason for this case`;
 	}
 
 	if (case_.refId) {
