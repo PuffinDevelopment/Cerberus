@@ -11,7 +11,7 @@ export async function findCases(phrase: string, guildId: Snowflake) {
 	const mongo = getModelForClass(cases);
 
 	if (!phrase.length) {
-		return mongo.find({ guildId }).sort({ createdAt: -1 }).limit(25);
+		return mongo.find({ guild_id: guildId }).sort({ createdAt: -1 }).limit(25);
 	}
 
 	if (!Number.isNaN(Number.parseInt(phrase, 10)) && phrase.length < SNOWFLAKE_MIN_LENGTH) {
