@@ -18,7 +18,7 @@ import {
 	REPORT_DUPLICATE_PRE_EXPIRE_SECONDS,
 } from "../../../../Constants.js";
 import { upsertReportLog } from "../../../../functions/logging/upsertReportLog.js";
-import { createReport, ReportStatus, ReportType } from "../../../../functions/reports/createReport.js";
+import { type Report, createReport, ReportStatus, ReportType } from "../../../../functions/reports/createReport.js";
 import type { ReportCommand } from "../../../../interactions/index.js";
 import { reports } from "../../../../models/reports.js";
 import { kRedis } from "../../../../tokens.js";
@@ -29,6 +29,7 @@ type MemberAssuredReportArgs = ArgsParam<typeof ReportCommand>["user"] & { user:
 export async function user(
 	interaction: InteractionParam | ModalSubmitInteraction<"cached">,
 	args: ArgsParam<typeof ReportCommand>["user"],
+	pendingReport?: Report | null,
 ) {
 	const redis = container.resolve<Redis>(kRedis);
 	const key = `guild:${interaction.guildId}:report:user:${args.user.user.id}`;
@@ -51,10 +52,11 @@ export async function user(
 	const reportKey = nanoid();
 	const cancelKey = nanoid();
 
+	const reportButtonText = pendingReport ? "Forward Message" : "Create Report";
 	const reportButton = createButton({
 		customId: reportKey,
-		label: "Create Report",
-		style: ButtonStyle.Danger,
+		label: reportButtonText,
+		style: pendingReport ? ButtonStyle.Primary : ButtonStyle.Danger,
 	});
 	const cancelButton = createButton({
 		customId: cancelKey,
@@ -143,7 +145,7 @@ export async function user(
 
 		if (await redis.exists(key)) {
 			await collectedInteraction.editReply({
-				content: "This user has already been recently reported, thanks for making our community a better place!",
+				content: "This message has already been recently reported, thanks for making our community a better place!",
 				embeds: [],
 				components: [],
 			});

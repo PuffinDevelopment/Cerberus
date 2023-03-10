@@ -1,11 +1,13 @@
 import { Command, logger, createModal, createModalActionRow, createTextComponent } from "@yuudachi/framework";
 import type { ArgsParam, InteractionParam, CommandMethod } from "@yuudachi/framework/types";
-import { TextInputStyle, ComponentType } from "discord.js";
+import { type GuildMember, type User, type Message, TextInputStyle, ComponentType } from "discord.js";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import type { Redis } from "ioredis";
 import { nanoid } from "nanoid";
 import { inject, injectable } from "tsyringe";
 import { REPORT_REASON_MAX_LENGTH, REPORT_REASON_MIN_LENGTH } from "../../Constants.js";
+import type { Report } from "../../functions/reports/createReport.js";
+import { getPendingReportByTarget } from "../../functions/reports/getReport.js";
 import { checkLogChannel } from "../../functions/settings/checkLogChannel.js";
 import { getGuildSetting, SettingsKeys } from "../../functions/settings/getGuildSetting.js";
 import type { ReportCommand, ReportMessageContextCommand, ReportUserContextCommand } from "../../interactions/index.js";
@@ -43,48 +45,30 @@ export default class extends Command<
 			const { guildId, channelId, messageId } = parsedLink;
 			const messageArg = await resolveMessage(guildId!, channelId!, messageId!);
 
-			if (messageArg.author.bot) {
-				throw new Error("You cannot report bots.");
-			}
+			const pendingReport = await this.validateReport(interaction.member, messageArg.author, messageArg);
 
-			if (messageArg.author.id === interaction.user.id) {
-				throw new Error("You cannot report yourself.");
-			}
-
-			const key = `guild:${interaction.guildId}:report:channel:${interaction.channelId}:message:${messageArg.id}`;
-
-			if (await this.redis.exists(key)) {
-				throw new Error(
-					"This message has already been recently reported, thanks for making our community a better place!",
-				);
-			}
-
-			await message(interaction, {
-				reason: args.message.reason,
-				message: messageArg,
-			});
+			await message(
+				interaction,
+				{
+					reason: args.message.reason,
+					message: messageArg,
+				},
+				pendingReport,
+			);
 		} else {
-			if (args.user.user.user.bot) {
-				throw new Error("You cannot report bots.");
+			if (!args.user.user.member) {
+				throw new Error("The given member is not in this guild.");
 			}
 
-			if (args.user.user.user.id === interaction.user.id) {
-				throw new Error("You cannot report yourself.");
-			}
+			const pendingReport = await this.validateReport(interaction.member, args.user.user.user);
 
-			const key = `guild:${interaction.guildId}:report:user:${args.user.user.user.id}`;
-
-			if (await this.redis.exists(key)) {
+			if (pendingReport && !args.user.attachment) {
 				throw new Error(
 					"This user has already been recently reported, thanks for making our community a better place!",
 				);
 			}
 
-			if (!args.user.user.member) {
-				throw new Error("The given member is not in this guild.");
-			}
-
-			await user(interaction, args.user);
+			await user(interaction, args.user, pendingReport);
 		}
 	}
 
@@ -100,23 +84,11 @@ export default class extends Command<
 
 		const modalKey = nanoid();
 
-		if (args.user.user.bot) {
-			throw new Error("You cannot report bots.");
-		}
-
-		if (args.user.user.id === interaction.user.id) {
-			throw new Error("You cannot report yourself.");
-		}
-
-		const key = `guild:${interaction.guildId}:report:user:${args.user.user.id}`;
-
-		if (await this.redis.exists(key)) {
-			throw new Error("This user has already been recently reported, thanks for making our community a better place!");
-		}
-
 		if (!args.user.member) {
 			throw new Error("The given member is not in this guild.");
 		}
+
+		await this.validateReport(interaction.member, args.user.user);
 
 		const modal = createModal({
 			customId: modalKey,
@@ -186,21 +158,7 @@ export default class extends Command<
 
 		const modalKey = nanoid();
 
-		if (args.message.author.bot) {
-			throw new Error("You cannot report bots.");
-		}
-
-		if (args.message.author.id === interaction.user.id) {
-			throw new Error("You cannot report yourself.");
-		}
-
-		const key = `guild:${interaction.guildId}:report:channel:${interaction.channelId}:message:${args.message.id}`;
-
-		if (await this.redis.exists(key)) {
-			throw new Error(
-				"This message has already been recently reported, thanks for making our community a better place!",
-			);
-		}
+		const pendingReport = await this.validateReport(interaction.member, args.message.author, args.message);
 
 		const modal = createModal({
 			customId: modalKey,
@@ -252,9 +210,45 @@ export default class extends Command<
 			.flatMap((row) => row.components)
 			.map((component) => (component.type === ComponentType.TextInput ? component.value || "" : ""));
 
-		await message(modalInteraction, {
-			message: args.message,
-			reason: reason.join(" "),
-		});
+		await message(
+			modalInteraction,
+			{
+				message: args.message,
+				reason: reason.join(" "),
+			},
+			pendingReport,
+		);
+	}
+
+	private async validateReport(
+		author: GuildMember,
+		target: User,
+		message?: Message<boolean>,
+	): Promise<Report | null | undefined> {
+		if (target.bot) {
+			throw new Error("You cannot report bots.");
+		}
+
+		if (target.id === author.id) {
+			throw new Error("You cannot report yourself.");
+		}
+
+		const userKey = `guild:${author.guild.id}:report:user:${target.id}`;
+		const latestReport = await getPendingReportByTarget(author.guild.id, target.id);
+		if (latestReport || (await this.redis.exists(userKey))) {
+			if (!latestReport || (latestReport.attachmentUrl && !message)) {
+				throw new Error(
+					"This user has already been recently reported, thanks for making our community a better place!",
+				);
+			}
+
+			if (message && latestReport!.messageId!.includes(message.id)) {
+				throw new Error(
+					"This message has already been recently reported, thanks for making our community a better place!",
+				);
+			}
+		}
+
+		return latestReport;
 	}
 }

@@ -11,7 +11,8 @@ import {
 } from "../../../../Constants.js";
 import { formatMessageToEmbed } from "../../../../functions/logging/formatMessageToEmbed.js";
 import { upsertReportLog } from "../../../../functions/logging/upsertReportLog.js";
-import { createReport, ReportStatus, ReportType } from "../../../../functions/reports/createReport.js";
+import { type Report, createReport, ReportStatus, ReportType } from "../../../../functions/reports/createReport.js";
+import { getPendingReportByTarget } from "../../../../functions/reports/getReport.js";
 import type { ReportCommand } from "../../../../interactions/index.js";
 import { reports } from "../../../../models/reports.js";
 import { kRedis } from "../../../../tokens.js";
@@ -24,6 +25,7 @@ type MessageReportArgs = Omit<ArgsParam<typeof ReportCommand>["message"], "messa
 export async function message(
 	interaction: InteractionParam | ModalSubmitInteraction<"cached">,
 	args: MessageReportArgs,
+	pendingReport?: Report | null,
 ) {
 	const redis = container.resolve<Redis>(kRedis);
 	const key = `guild:${interaction.guildId}:report:channel:${interaction.channelId!}:message:${args.message.id}`;
@@ -32,10 +34,11 @@ export async function message(
 	const reportKey = nanoid();
 	const cancelKey = nanoid();
 
+	const reportButtonText = pendingReport ? "Forward Message" : "Create Report";
 	const reportButton = createButton({
 		customId: reportKey,
-		label: "Create Report",
-		style: ButtonStyle.Danger,
+		label: reportButtonText,
+		style: pendingReport ? ButtonStyle.Primary : ButtonStyle.Danger,
 	});
 	const cancelButton = createButton({
 		customId: cancelKey,
@@ -102,7 +105,8 @@ export async function message(
 	} else if (collectedInteraction?.customId === reportKey) {
 		await collectedInteraction.deferUpdate();
 
-		if (await redis.exists(key)) {
+		const lastReport = await getPendingReportByTarget(interaction.guildId!, args.message.author.id);
+		if (lastReport!.messageId!.includes(args.message.id)) {
 			await collectedInteraction.editReply({
 				content: "This message has already been recently reported, thanks for making our community a better place!",
 				embeds: [],
